@@ -1,29 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const filmsList = document.getElementById('films');
-    const posterImg = document.getElementById('poster');
-    const titleDiv = document.getElementById('title');
-    const runtimeDiv = document.getElementById('runtime');
-    const filmInfoDiv = document.getElementById('film-info');
-    const showtimeSpan = document.getElementById('showtime');
-    const ticketNumSpan = document.getElementById('ticket-num');
-    const buyTicketBtn = document.getElementById('buy-ticket');
-    const deleteMovieBtn = document.getElementById('delete-movie');
 
-    // Fetch and display movie details
+    // Fetch the details of the movie
     fetchMovieDetails(1);
 
-    // Fetch and display movie list
+    // Fetch the list of movies
     fetchMovieList();
 
-    // Event listener for buying tickets
+    // An event listener for buying tickets
+    const buyTicketBtn = document.getElementById('buy-ticket');
+
     buyTicketBtn.addEventListener('click', function() {
-      // Implement buy ticket functionality here
-      fetch("http://localhost:4000/films/1")
+      // Implemented buy ticket functionality
+      fetch('http://localhost:3000/films/1')
         .then(response => response.json())
         .then(movie => {
           if (movie.tickets_sold < movie.capacity) {
             const updatedTicketsSold = movie.tickets_sold + 1;
-            fetch('http://localhost:4000/films/1' , {
+            fetch('http://localhost:3000/films/1' , {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json'
@@ -34,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(updatedMovie => {
               fetchMovieDetails(updatedMovie.id);
             });
-            fetch('http://localhost:4000/tickets', {
+            fetch('http://localhost:3000/tickets', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -45,10 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Event listener for deleting a movie
+    // An event listener for deleting a movie
+    const deleteMovieBtn = document.getElementById('delete-movie');
     deleteMovieBtn.addEventListener('click', function() {
-      // Implement delete movie functionality here
-      fetch("http://localhost:4000/films/1", {
+      // Implemented delete movie functionality
+      fetch("http://localhost:3000/films/1", {
         method: 'DELETE'
       })
       .then(response => {
@@ -60,16 +54,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function fetchMovieDetails(movieId) {
-      fetch('http://localhost:4000/films/${movieId}')
+      fetch(`http://localhost:3000/films/${movieId}`)
         .then(response => response.json())
         .then(movie => {
-          posterImg.src = movie.poster;
-          titleDiv.textContent = movie.title;
-          runtimeDiv.textContent = '${movie.runtime} minutes';
-          filmInfoDiv.textContent = movie.description;
-          showtimeSpan.textContent = movie.showtime;
+            const posterImg = document.getElementById('poster');
+            posterImg.src = movie.poster;
+            const titleDiv = document.getElementById('title');
+            titleDiv.textContent = movie.title;
+            const runtimeDiv = document.getElementById('runtime');
+            runtimeDiv.textContent = `${movie.runtime} minutes`;
+            const filmInfoDiv = document.getElementById('film-info');
+            filmInfoDiv.textContent = movie.description;
+            const showtimeSpan = document.getElementById('showtime');
+            showtimeSpan.textContent = movie.showtime;
           const availableTickets = movie.capacity - movie.tickets_sold;
-          ticketNumSpan.textContent = '${availableTickets} remaining tickets';
+          const ticketNumSpan = document.getElementById('ticket-num');
+          ticketNumSpan.textContent = `${availableTickets} remaining tickets`;
           if (availableTickets === 0) {
             buyTicketBtn.textContent = "Sold Out";
             buyTicketBtn.disabled = true;
@@ -78,11 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function fetchMovieList() {
-      fetch("http://localhost:4000/films")
+      fetch("http://localhost:3000/films")
         .then(response => response.json())
         .then(movies => {
-          filmsList.innerHTML = '';
-          movies.forEach(movie => {
+            const filmsList = document.getElementById('films');
+            filmsList.innerHTML = '';
+            movies.forEach(movie => {
             const li = document.createElement('li');
             li.classList.add('film', 'item');
             li.textContent = movie.title;
